@@ -2,9 +2,9 @@
 # defaults file for bamboo
 
 # psycopg2 needed to check superuser has password
-role_prerequisites:
+bamboo_prerequisites:
   - python-psycopg2
-bamboo_version:   5.5.1
+bamboo_version:   5.8.1
 bamboo_baseurl:   http://www.atlassian.com/software/bamboo/downloads/binary
 bamboo_installer: atlassian-bamboo-{{ bamboo_version }}.tar.gz
 bamboo_user:      bamboo
