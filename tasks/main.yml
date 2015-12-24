@@ -29,12 +29,10 @@
     url: "{{ bamboo_baseurl }}/{{ bamboo_installer }}"
     dest: "{{ bamboo_tmp }}/{{ bamboo_installer }}"
   register: fetch
-  tags: install
 
 - name: Extract installation
   shell: tar xvf {{ bamboo_tmp }}/{{ bamboo_installer }} -C {{ bamboo_installto }} --transform='s#\(atlassian\)-#\1/#'
   when: fetch.changed
-  tags: install
 
 - name: Ensure consistent file ownership
   file:
@@ -56,14 +54,12 @@
     regexp: "^bamboo.home"
     line: "bamboo.home={{ bamboo_datadir }}"
     state: present
-  tags: install
 
 - name: Ensure logs symlink exists
   file:
     src: "{{ bamboo_installto }}/atlassian/bamboo-{{ bamboo_version }}/logs"
     path: /var/log/bamboo
     state: link
-  tags: install
 
 - name: Ensure service definition exists
   template:
@@ -72,7 +68,16 @@
     owner: root
     group: root
     mode: 0755
-  tags: install
+  when: ansible_distribution_major_version == 6
+
+- name: Ensure service definition exists
+  template:
+    src: bamboo.service.j2
+    dest: /etc/systemd/system/bamboo.service
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_distribution_major_version == 7
 
 - name: add proxy config to Tomcat settings
   template:
@@ -81,7 +86,6 @@
     owner: "{{ bamboo_user }}"
     group: "{{ bamboo_user }}"
     mode: 0644
-  tags: install
   when: bamboo_proxy is defined
 
 # login_user not specified, uses the module default. RTFM.
